@@ -122,7 +122,10 @@ Every from-scratch result was verified against its library equivalent (NumPy, Pa
 
 ## 10. Selected Features
 
-**Kept (15):** Tenure, Complain, DaySinceLastOrder, CashbackAmount, SatisfactionScore, NumberOfDeviceRegistered, CityTier, WarehouseToHome, NumberOfAddress, OrderCount, PreferedOrderCat, MaritalStatus, PreferredPaymentMode, PreferredLoginDevice, Gender
+**Kept (26):** Tenure, Complain, DaySinceLastOrder, CashbackAmount, SatisfactionScore, NumberOfDeviceRegistered, CityTier, WarehouseToHome, NumberOfAddress, OrderCount, Gender, "PreferredLoginDevice_Computer",
+    "PreferredLoginDevice_Phone","PreferredPaymentMode_Cash_On_Delivery","PreferredPaymentMode_Credit_Card", "PreferredPaymentMode_Debit_Card",
+    "PreferredPaymentMode_E_Wallet","PreferredPaymentMode_Upi", "PreferedOrderCat_Fashion","PreferedOrderCat_Grocery","PreferedOrderCat_Laptop_&_Accessory",
+    "PreferedOrderCat_Mobile","PreferedOrderCat_Others","MaritalStatus_Divorced","MaritalStatus_Married","MaritalStatus_Single"
 
 **Removed (3):**
 - **HourSpendOnApp** — ANOVA F-score (1.66) below the critical value (3.84); near-zero Pearson correlation (0.019). No evidence of relationship with churn.
