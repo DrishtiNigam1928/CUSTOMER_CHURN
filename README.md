@@ -33,6 +33,7 @@ The objective is not to build a final predictive model, but to demonstrate a com
 - **Duplicate records:** 0 (verified explicitly, not assumed)
 
 **Column Name**                         | **Data Type**       | **Unique Values**   | **Missing Values**
+|---|---|---|---|
 CustomerID                          | int64           | 4504            | 0
 Churn                               | int64           | 2               | 0
 Tenure                              | float64         | 35              | 218
