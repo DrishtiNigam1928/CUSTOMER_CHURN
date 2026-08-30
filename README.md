@@ -107,7 +107,7 @@ Every from-scratch result was verified against its library equivalent (NumPy, Pa
 |---|---|
 | Original Dataset | 20 (18 input + ID + target) |
 | After Preprocessing (Cleaning & Encoding) | 36 |
-| After Feature Selection | 15 |
+| After Feature Selection | 26 |
 
 | Parameter | Before Preprocessing | After Preprocessing |
 |---|---|---|
