@@ -3,11 +3,7 @@ import numpy as np
 from scipy.stats import zscore
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.feature_selection import VarianceThreshold
-from scipy.stats import chi2 as chi2_dist
-from scipy.stats import f as f_dist
-# from IPython.display import display
+
 
 # FILENAME = "CUSTOMER_CHURN/dataset/train_dataset.csv"
 df = pd.read_csv("train_dataset.csv")
@@ -25,7 +21,6 @@ print("Target variable:", target_col)
 print("Number of input features:", len(input_features))
 print("Input features:", input_features)
 
-
 #  A2: Numerical vs Categorical variables -
 numerical_vars = df[input_features].select_dtypes(include=np.number).columns.tolist()
 categorical_vars = df[input_features].select_dtypes(exclude=np.number).columns.tolist()
@@ -33,12 +28,12 @@ categorical_vars = df[input_features].select_dtypes(exclude=np.number).columns.t
 print("Numerical variables (", len(numerical_vars), "):", numerical_vars)
 print()
 print("Categorical variables (", len(categorical_vars), "):", categorical_vars)
-print("\n")
 
 # A2: Source of dataset -
 print("Source: Kaggle - Ecommerce Customer Churn Analysis and Prediction")
 print("URL: https://www.kaggle.com/datasets/ankitverma2010/ecommerce-customer-churn-analysis-and-prediction")
 
+df.describe()
 
 #  All Numerical features
 features_to_test = [
@@ -78,8 +73,7 @@ def execute_task_B1(dataframe):
 
 execute_task_B1(df)
 print("\nTask B1 Completed Successfully!")
-print("\n")
-
+print()
 
 # B2
 def calc_mean(values):
@@ -148,9 +142,7 @@ for col in features_to_test:
     }
 
 stats_table = pd.DataFrame(stats_dict).T
-print(stats_table)
-print("\n")
-
+stats_table
 
 # C1
 missing_count = df.isnull().sum()
@@ -166,8 +158,7 @@ missing_table = missing_table[missing_table["Missing Values"] >= 0].sort_values(
 num_missing_vals = (missing_table["Missing Values"]).sum() # For Task N
 
 print(missing_table)
-print("\n")
-
+print()
 
 # Task C2: Handling Missing Values
 
@@ -190,7 +181,6 @@ for col in ["CouponUsed", "OrderCount"]:
     df_cleaned[col] = df_cleaned[col].fillna(
         stats_dict[col]["Mode"]
     )
-print("\n")
 
 # Before → After Missing Value Treatment
 missing_features = ["Tenure","WarehouseToHome","HourSpendOnApp","OrderAmountHikeFromlastYear","CouponUsed","OrderCount","DaySinceLastOrder"]
@@ -205,11 +195,9 @@ comparison = pd.DataFrame({
 })
 
 print(comparison)
-print("\n")
-
+print()
 
 # D1: Duplicate Detection
-import pandas as pd
 
 original_records = len(df_cleaned)
 
@@ -233,10 +221,18 @@ duplicate_summary_table = pd.DataFrame({
 })
 
 print(duplicate_summary_table)
-print("\n")
+print()
 
+#  D2: check ALL categorical columns ---
+print("Full categorical variable list from A2:", categorical_vars)
+
+for col in categorical_vars:
+    print(f"--- {col} ---")
+    print(df_cleaned[col].unique())
+    print()
 
 #  D2: Standardize categorical inconsistencies
+
 standardization_map = {
     "PreferredLoginDevice": {
         "Mobile Phone": "Phone",
@@ -300,6 +296,7 @@ print()
 
 
 # --- D2: Check numeric columns for impossible/negative values
+
 invalid_report = []
 for col in features_to_test:
     if col in df_cleaned.columns:
@@ -308,7 +305,6 @@ for col in features_to_test:
 
 print(pd.DataFrame(invalid_report))
 print()
-
 
 # Task E1: Label Encoding for 'Gender'
 target_label_col="Gender"
@@ -332,8 +328,8 @@ print(f"Mapping used for '{target_label_col}': {gender_mapping}\n")
 print(df_cleaned[[target_label_col, "Gender_Encoded"]].head(8))
 print("\n")
 print(df_cleaned["Gender_Encoded"].value_counts())
-
 print()
+
 
 
 # Task E2: One Hot Encoding
@@ -364,39 +360,16 @@ for col in one_hot_cols:
 
 print("Task E2: One-Hot Encoding Completed Successfully!\n")
 print(f"Total columns in dataframe after OHE: {len(df_cleaned.columns)}")
+print()
 
 # verification of the columns using display() function
 ohe_sample_cols = [c for c in df_cleaned.columns if any(col in c for col in one_hot_cols)][:20]
 print(df_cleaned[ohe_sample_cols].head(10))
-
 print()
 
 
 # F1: from-scratch IQR calculation
 
-def calc_percentile(sorted_values, percentile):
-    """Calculates the percentile position using linear interpolation (same method pandas uses by default)."""
-    n = len(sorted_values)
-    index = percentile * (n - 1)
-    lower_index = int(index)
-    upper_index = lower_index + 1
-
-    if upper_index >= n:
-        return sorted_values[lower_index]
-
-    fraction = index - lower_index
-    return sorted_values[lower_index] + fraction * (sorted_values[upper_index] - sorted_values[lower_index])
-
-def calc_q1(values):
-    sorted_vals = sorted(values)
-    return calc_percentile(sorted_vals, 0.25)
-
-def calc_q3(values):
-    sorted_vals = sorted(values)
-    return calc_percentile(sorted_vals, 0.75)
-
-
-# F1: from-scratch IQR calculation
 def calc_percentile(sorted_values, percentile):
     """Calculates the percentile position using linear interpolation (same method pandas uses by default)."""
     n = len(sorted_values)
@@ -447,8 +420,7 @@ iqr_table = pd.DataFrame(iqr_report).sort_values("Outliers Detected", ascending=
 
 tot_outliers_count_iqr = (iqr_table["Outliers Detected"]).sum() # For Task N
 
-print(iqr_table)
-print()
+iqr_table
 
 #  Library verification (NumPy quantile)
 verify_rows = []
@@ -504,8 +476,8 @@ tot_outliers_count_z_score = (z_table["Outliers Detected"]).sum() # For Task N
 print(z_table)
 print()
 
-# Library Verification using SciPy zscore for F2 Task
 
+# Library Verification using SciPy zscore for F2 Task
 verify_z_rows = []
 for col in features_to_test:
   clean_series = df_cleaned[col].dropna()
@@ -524,9 +496,8 @@ for col in features_to_test:
 print(pd.DataFrame(verify_z_rows))
 print()
 
-# F3 + G - Outlier Treatment using Transformation
 
-import numpy as np
+# F3 + G - Outlier Treatment using Transformation
 df_outlier_transform = df_cleaned.copy()
 
 #Apply Log(x + 1) Transformation
@@ -600,9 +571,7 @@ for col in normalized_cols:
     })
 
 verification_table = pd.DataFrame(verification_rows)
-print(verification_table)
-print()
-
+verification_table
 
 # H2: Standardization for numerical values [Feature Scaling]
 
@@ -639,6 +608,7 @@ print()
 
 
 # Library Verification using StandardScaler from scikit-learn for H2 Task
+
 verify_std_rows = []
 scaler = StandardScaler()
 
@@ -741,7 +711,6 @@ print()
 
 # # Task I - Bar chart for PreferredLoginDevice, PreferredPaymentMode and CityTier
 
-# import matplotlib.pyplot as plt
 
 # bar_features = ['PreferredLoginDevice', 'PreferredPaymentMode', 'CityTier']
 

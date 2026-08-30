@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 from preprocessing import df_cleaned
-from sklearn.feature_selection import VarianceThreshold
 from scipy.stats import chi2 as chi2_dist
+from scipy.stats import chi2_contingency
 from scipy.stats import f as f_dist
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -95,10 +95,16 @@ def calc_range(min_val, max_val):
 # Task M1
 print("Total features being checked:", len(features_to_test))
 print(features_to_test)
+print()
 
 # --- Calculate variance for each selected feature ---
 variance_report = []
+def calc_mean(values):
+    return sum(values) / len(values)
 
+def calc_variance(values, mean_val):
+    squared_diffs = [(v - mean_val) ** 2 for v in values]
+    return sum(squared_diffs) / len(values)
 for col in features_to_test:
     values = df_cleaned[col].dropna().tolist()
     mean_val = calc_mean(values)
@@ -109,19 +115,21 @@ variance_table = pd.DataFrame(variance_report).sort_values("Variance").reset_ind
 print(variance_table)
 print()
 
+# --- Library Verification using NumPy variance (np.var) ---
+lib_variance_report = []
 
-# --- Library verification ---
-check_data = df_cleaned[features_to_test].dropna()
-selector = VarianceThreshold(threshold=0.0)
-selector.fit(check_data)
-lib_variances = selector.variances_
+for col in features_to_test:
+    values = df_cleaned[col].dropna().values
+    lib_var = np.var(values, ddof=0)
+    lib_variance_report.append({"Feature": col, "Lib Variance": lib_var})
 
-lib_check = pd.DataFrame({"Feature": features_to_test, "Lib Variance": lib_variances})
+lib_check = pd.DataFrame(lib_variance_report)
+
 merged_check = variance_table.merge(lib_check, on="Feature")
 merged_check["Match"] = np.isclose(merged_check["Variance"], merged_check["Lib Variance"], atol=1e-6)
 
-print("Library Verification using VarianceThreshold from scikit-learn for M1 Task")
-merged_check[["Feature", "Variance", "Lib Variance", "Match"]]
+print("Library Verification using NumPy (np.var) for M1 Task")
+print(merged_check[["Feature", "Variance", "Lib Variance", "Match"]])
 print()
 
 
@@ -158,6 +166,7 @@ print()
 
 print("Number of numerical features:", len(features_to_test))
 print(features_to_test)
+print()
 
 def calc_pearson(x, y):
 
@@ -197,8 +206,8 @@ def calc_pearson(x, y):
 
     return numerator / denominator
 
-# M2: Feature-Target Correlation
 
+# M2: Feature-Target Correlation
 feature_target_results = []
 
 for feature in features_to_test:
@@ -290,7 +299,6 @@ if len(redundant_features_table) == 0:
 else:
 
     print(redundant_features_table)
-
 print()
 
 # M2: Pearson Correlation Heatmap
@@ -314,7 +322,6 @@ print()
 
 # plt.tight_layout()
 # plt.show()
-# print()
 
 # M2: Feature-Target Correlation Interpretation
 
@@ -373,7 +380,6 @@ correlation_match = np.isclose(
 print("All correlations match:",correlation_match.all())
 print()
 
-
 # --- Task M3: Chi-Square Feature Selection
 categorical_features_for_chi2 = ["Gender", "PreferredLoginDevice", "PreferredPaymentMode",
                                   "PreferedOrderCat", "MaritalStatus", "CityTier", "Complain"
@@ -381,6 +387,7 @@ categorical_features_for_chi2 = ["Gender", "PreferredLoginDevice", "PreferredPay
 
 categorical_features_for_chi2 = [c for c in categorical_features_for_chi2 if c in df_cleaned.columns]
 print("Features to test:", categorical_features_for_chi2)
+print()
 
 # Contingency table + Observed frequencies ---
 def build_contingency_table(df, feature_col, target_col):
@@ -423,6 +430,7 @@ def calc_chi_square(contingency_df):
     degrees_of_freedom = (r - 1) * (c - 1)
 
     return expected_df, chi2_contrib_df, total_chi2, degrees_of_freedom
+
   # --- Apply Chi-Square to every candidate feature ---
 target_categories = sorted(df_cleaned["Churn"].dropna().unique())
 chi2_summary = []
@@ -450,8 +458,8 @@ chi2_table = pd.DataFrame(chi2_summary).sort_values("Chi-Square Statistic", asce
 print(chi2_table)
 print()
 
-
 # --- Interpretation: compare p-value against alpha (significance level) ---
+
 
 alpha = 0.05
 
@@ -462,7 +470,9 @@ chi2_table["p-value"] = chi2_table.apply(
 chi2_table["Significant (p < alpha)"] = chi2_table["p-value"] < alpha
 
 print(f"Using alpha (significance level) = {alpha}")
-chi2_table
+print(chi2_table)
+print()
+
 
 # --- Display one feature's full tables
 sample_feature = chi2_table.iloc[0]["Feature"]
@@ -477,28 +487,28 @@ print(f"\n--- {sample_feature}: Chi-Square Contributions per Cell ---")
 print(chi2_details[sample_feature]["Contributions"].round(3))
 print()
 
-
-# --- Library verification
-from scipy.stats import chi2_contingency
-
 verify_rows = []
 for col in categorical_features_for_chi2:
     ct = pd.crosstab(df_cleaned[col], df_cleaned["Churn"])
-    lib_chi2, lib_p, lib_dof, _ = chi2_contingency(ct)
+    lib_chi2, lib_p, lib_dof, _ = chi2_contingency(ct, correction=False)   # <-- disable Yates' correction
 
     my_row = chi2_table[chi2_table["Feature"] == col].iloc[0]
     verify_rows.append({
         "Feature": col,
         "My Chi2": my_row["Chi-Square Statistic"],
-        "Lib Chi2": round(lib_chi2, 3),
-        "Match": np.isclose(my_row["Chi-Square Statistic"], lib_chi2, atol=0.5)
+        "Lib Chi2 (no correction)": round(lib_chi2, 3),
+        "Match": np.isclose(my_row["Chi-Square Statistic"], lib_chi2, atol=0.01)
     })
 
 print(pd.DataFrame(verify_rows))
 print()
 
-
 # M4: ANOVA F-TEST
+
+
+
+
+
 features_for_anova = [col for col in features_to_test if col in df_cleaned.columns]
 anova_df = df_cleaned[features_for_anova + ['Churn']].dropna()
 
@@ -561,8 +571,10 @@ print("Task M4: ANOVA F-Test computed successfully from scratch using B2 functio
 print(anova_scratch_table)
 print()
 
-
 # TASK M6: FEATURE SELECTION MAPPING TABLE
+
+
+
 feature_selection_mapping_table = [
     {
         "Method": "Variance Threshold",
@@ -601,8 +613,10 @@ print("Task M6: Updated Feature Selection Technique & Feature Mapping Table")
 print(df_mapping_table)
 print()
 
-
 # TASK M7: FINAL DECISION TABLE
+
+
+
 final_decision_table = [
     {
         "Feature": "Tenure",
@@ -787,16 +801,18 @@ print()
 
 # Task N: Before vs After Preprocessing Comparison Table
 
+
+
 preprocessing_exact_data = [
     {
         "Parameter": "Records",
-        "Before Preprocessing": "4,504",
+        "Before Preprocessing": "5,630",
         "After Preprocessing": "4,504"
     },
     {
         "Parameter": "Features",
-        "Before Preprocessing": "20",
-        "After Preprocessing": "36"
+        "Before Preprocessing": "19",
+        "After Preprocessing": "35"
     },
     {
         "Parameter": "Missing Values",
@@ -810,7 +826,7 @@ preprocessing_exact_data = [
     },
     {
         "Parameter": "Categorical Features",
-        "Before Preprocessing": "5",
+        "Before Preprocessing": "7",
         "After Preprocessing": "0"
     },
     {
@@ -826,7 +842,7 @@ preprocessing_exact_data = [
     {
         "Parameter": "Selected Features",
         "Before Preprocessing": "18",
-        "After Preprocessing": "15"
+        "After Preprocessing": "26"
     }
 ]
 
