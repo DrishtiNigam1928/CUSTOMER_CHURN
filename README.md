@@ -111,14 +111,14 @@ Every from-scratch result was verified against its library equivalent (NumPy, Pa
 
 | Parameter | Before Preprocessing | After Preprocessing |
 |---|---|---|
-| Records | 4,504 (train split) | 4,504 |
-| Features | 20 | 36 |
+| Records | 5,630 | 4,504(train-split) |
+| Features | 19 | 35 |
 | Missing Values | 1,478 | 0 |
 | Duplicate Records | 0 | 0 |
-| Categorical Features (raw text) | 5 | 0 (fully encoded) |
+| Categorical Features (raw text) | 7 | 0 (fully encoded) |
 | Outliers (IQR Method) | 1,824 | 1,824 detected — treated via transformation, not deletion |
 | Outliers (Z-Score Method) | 293 | 293 detected |
-| Selected Features | 19 | 15 |
+| Selected Features | 18 | 26 |
 
 ## 10. Selected Features
 
