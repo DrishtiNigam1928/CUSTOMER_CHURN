@@ -32,6 +32,29 @@ The objective is not to build a final predictive model, but to demonstrate a com
 - **Missing values:** 1,478 missing values spread across 7 numerical columns (Tenure, WarehouseToHome, HourSpendOnApp, OrderAmountHikeFromlastYear, CouponUsed, OrderCount, DaySinceLastOrder — each with roughly 4.4%–5.3% missingness)
 - **Duplicate records:** 0 (verified explicitly, not assumed)
 
+**Column Name**                         | **Data Type**       | **Unique Values**   | **Missing Values**
+CustomerID                          | int64           | 4504            | 0
+Churn                               | int64           | 2               | 0
+Tenure                              | float64         | 35              | 218
+PreferredLoginDevice                | object          | 3               | 0
+CityTier                            | int64           | 3               | 0
+WarehouseToHome                     | float64         | 34              | 206
+PreferredPaymentMode                | object          | 7               | 0
+Gender                              | object          | 2               | 0
+HourSpendOnApp                      | float64         | 6               | 198
+NumberOfDeviceRegistered            | int64           | 6               | 0
+PreferedOrderCat                    | object          | 6               | 0
+SatisfactionScore                   | int64           | 5               | 0
+MaritalStatus                       | object          | 3               | 0
+NumberOfAddress                     | int64           | 13              | 0
+Complain                            | int64           | 2               | 0
+OrderAmountHikeFromlastYear         | float64         | 16              | 212
+CouponUsed                          | float64         | 16              | 205
+OrderCount                          | float64         | 16              | 202
+DaySinceLastOrder                   | float64         | 22              | 237
+CashbackAmount                      | float64         | 2464            | 0
+
+
 ## 5. Dataset Source
 **Kaggle — Ecommerce Customer Churn Analysis and Prediction**
 https://www.kaggle.com/datasets/ankitverma2010/ecommerce-customer-churn-analysis-and-prediction
